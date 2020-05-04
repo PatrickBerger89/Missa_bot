@@ -1,0 +1,112 @@
+{
+  "705531802197950494": {
+    "id": "705531802197950494",
+    "name": "Missa",
+    "salon": "out",
+    "game": "inc",
+    "type": "inc",
+    "time": 1588583755178,
+    "date": "2020-05-04 09:15:55",
+    "alert": 0,
+    "jeton": 5
+  },
+  "357242504573091840": {
+    "id": "357242504573091840",
+    "name": "Flo3376",
+    "salon": "out",
+    "game": "fryer@fryer-System-Product-Name: ~/Missa_boot",
+    "type": "PLAYING",
+    "time": 1588586707099,
+    "date": "2020-05-04 10:05:07",
+    "alert": 0,
+    "jeton": 5
+  },
+  "220528503467016193": {
+    "id": "220528503467016193",
+    "name": "Simon",
+    "salon": "out",
+    "game": "Call of Duty: Modern Warfare",
+    "type": "PLAYING",
+    "time": 1588516702417,
+    "date": "2020-05-03 14:38:22",
+    "alert": 0,
+    "jeton": 5
+  },
+  "649670596627660806": {
+    "id": "649670596627660806",
+    "name": "Deathiny",
+    "salon": "out",
+    "game": "Star Citizen",
+    "type": "PLAYING",
+    "time": 1588574706404,
+    "date": "2020-05-04 06:45:06",
+    "alert": 0,
+    "jeton": 5
+  },
+  "174098312583053313": {
+    "id": "174098312583053313",
+    "name": "0kamiTV",
+    "salon": "out",
+    "game": "Euro Truck Simulator 2",
+    "type": "PLAYING",
+    "time": 1588550756342,
+    "date": "2020-05-04 00:05:56",
+    "alert": 0,
+    "jeton": 5
+  },
+  "182955908295426048": {
+    "id": "182955908295426048",
+    "name": "Karuja[Malkita]",
+    "salon": "out",
+    "game": "Star Citizen",
+    "type": "PLAYING",
+    "time": 1588513798416,
+    "date": "2020-05-03 13:49:58",
+    "alert": 0,
+    "jeton": 5
+  },
+  "258136402447958016": {
+    "id": "258136402447958016",
+    "name": "[gm]debshadows",
+    "salon": "out",
+    "game": "Star Citizen",
+    "type": "PLAYING",
+    "time": 1588501782807,
+    "date": "2020-05-03 10:29:42",
+    "alert": 0,
+    "jeton": 5
+  },
+  "310111201700872192": {
+    "id": "310111201700872192",
+    "name": "McFlurry",
+    "salon": "out",
+    "game": "inc",
+    "type": "inc",
+    "time": 1588318866011,
+    "date": "2020-05-01 07:41:06",
+    "alert": 0,
+    "jeton": 5
+  },
+  "361155779660742656": {
+    "id": "361155779660742656",
+    "name": "viridis35",
+    "salon": "out",
+    "game": "inc",
+    "type": "inc",
+    "time": 1588318866011,
+    "date": "2020-05-01 07:41:06",
+    "alert": 0,
+    "jeton": 5
+  },
+  "385008807689977856": {
+    "id": "385008807689977856",
+    "name": "[GM] Alpha",
+    "salon": "out",
+    "game": "inc",
+    "type": "inc",
+    "time": 1588586703757,
+    "date": "2020-05-04 10:05:03",
+    "alert": 0,
+    "jeton": 5
+  }
+}
