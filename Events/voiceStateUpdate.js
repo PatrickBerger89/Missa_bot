@@ -56,6 +56,7 @@ module.exports = async(client,oldMember, newMember)=>{
 					}
 				}
 
+				//si le membre rentre dans un salon vocal où il doit être accueillit pas une musique
 				if(salon_auto_play.includes(newMember.channel.id))
 				{
 					let voiceChannel = client.channels.cache.get(newMember.channel.id);
@@ -64,6 +65,8 @@ module.exports = async(client,oldMember, newMember)=>{
 						dispatcher.on('finish', () => {voiceChannel.leave()});
 					});
 				}
+
+				//si le membre rentre dans un salon vocal où il doit être accueillit pas un message vocal de bienvenue
 				if(salon_auto_says.includes(newMember.channel.id))
 				{
 					if(newMember.member.user.username!=="missa")
