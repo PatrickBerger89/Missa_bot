@@ -21,18 +21,21 @@ const client = new Discord.Client()
 //initialisation du bot
 client.login(config.token)
 
-client.commands = new Discord.Collection();
-
+//variable permettant ou pas à missa de rester dans un salon à la fin d'une lecture
 global.standby=false;
 
 global.salons={};
 global.sound_list=[];
 global.member_id={};
+
+//liste des salons où missa lancera le théme avenger
 global.salon_auto_play=["704788656896081990","704432846755987500"];//704432846755987500
+//liste des salons où missa souhaitera la bienvenue
 global.salon_auto_says=["705683831247601665","706790312441413663"];//705683831247601665
 
 
 
+client.commands = new Discord.Collection();
 //chargement des fichiers commandes js
 fs.readdir("./Commandes/",(error,f)=>{
 	if(error) console.log(error);
@@ -63,7 +66,6 @@ fs.readdir("./Events/",(error,f)=>{
 })
 
 //chargement des fichiers MP3
-
 count=0;
 let rep_mp3 = fs.readdirSync("./mp3/");
 rep_mp3.forEach((rep)=>{
@@ -78,8 +80,9 @@ rep_mp3.forEach((rep)=>{
 	
 })
 
+//prototype de fonction permettant d'agir si un membre de fait pas le bon jeux dans un salon réservé à un jeu spécifique
 setInterval(function() {
-	for (const property in member_id)
+	/*for (const property in member_id)
 	{
 		if (member_id[property].game!=="inc" && member_id[property].salon!=="inc")
 		{
@@ -122,30 +125,40 @@ setInterval(function() {
 				member_id[property].alert=0;
 			}
 		}
-	}
+	}*/
 }, 60000);
 
+
+//mise à jours de la base de données des salons et membres
 setInterval(function() {
+	//parcours des salons
 	var channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
+		//si le salon n'est pas une catégorie
 		if(channel["type"]!=="category")
 		{
+			//on prépare le tableau à stocker
 			salons[channel["id"]]={};
 			salons[channel["id"]].type=channel["type"];
 			salons[channel["id"]].name=channel["name"];
 			salons[channel["id"]].name=channel["name"];
 		}
 	}
+	//transformation en json stockable
 	var data_salons = JSON.stringify(salons,null, 2);
+	//ecriture du fichier JSON
 	fs.writeFileSync('./db/salons.json', data_salons);
 
+	//parcours des utilisateur
 	var users = client.users.cache;
 	for(let usr of users.values())
 	{
+		//si le membre n'existe pas, on lui crée une nouvelle fiche
 		if(typeof (member_id[usr.id]) === undefined)
 		{
-			console.log(usr.username);
+			//console.log(usr.username);
+			//on prépare le tableau à stocker
 			member_id[usr.id]={};
 			member_id[usr.id].id = usr['id'];
 			member_id[usr.id].name = usr.username;
@@ -157,6 +170,7 @@ setInterval(function() {
 			member_id[usr.id].alert = 0;
 			member_id[usr.id].jeton = 5;
 		}
+		//sinon on mets sa fiche à jours
 		else{
 			//if(member_id[usr.id].hasOwnProperty('jeton'))
 			//{
@@ -170,7 +184,9 @@ setInterval(function() {
 			
 		}
 	}
+	//transformation en json stockable
 	var data_members = JSON.stringify(member_id,null, 2);
+	//ecriture du fichier JSON
 	fs.writeFileSync('./db/members.json', data_members);
 	//console.log('BD mise à jours');
 }, 60000);
