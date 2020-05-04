@@ -18,8 +18,7 @@ module.exports.run = async (client,message,args) =>{
 		return message.author.send("Vous n'avez spécifiez un nombre réelle pour l'argent disponible");
 	}
 
-	//text=message.content.replace('+says ', '');
-
+	//on charge la methode request pour faire une demande post
 	const request = require('request')
 	let text=[];
 	let mes_test=0;
