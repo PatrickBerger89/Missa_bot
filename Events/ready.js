@@ -1,9 +1,11 @@
 //lancement de la lib de lecture distante
 const fs=require('fs');
 
+//si un event on ready arrive arrive (le boot a démarré et s'est connecté avec succés)
 module.exports =async(client) =>{
 	client.user.setPresence({activity:{name:"Ré écriture compléte du core du robot"}});
 
+	//on charge les données salons stocké sur fichier
 	let rawdata = fs.readFileSync('./db/salons.json');
 	console.log(rawdata.length)
 	if(rawdata.length>0)
@@ -11,22 +13,27 @@ module.exports =async(client) =>{
 		salon = JSON.parse(rawdata);
 	}
 
+	//on parcours les salons que nous retourne l'api discord
 	var channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
+		//si le salon n'est pas une catégorie
 		if(channel["type"]!=="category")
 		{
+			//on prépare le tableau et on le mets à jour au passage
 			salon[channel["id"]]={};
 			salon[channel["id"]].id=channel["id"];
 			salon[channel["id"]].type=channel["type"];
 			salon[channel["id"]].name=channel["name"];
 		}
 	}
+	//transformation en json stockable
 	let data_salons = JSON.stringify(salon,null, 2);
+	//ecriture du fichier JSON
 	fs.writeFileSync('./db/salons.json', data_salons);
 
 
-
+	//on charge les données membres stocké sur fichier
 	let rawdata2 = fs.readFileSync('./db/members.json');
 	console.log(rawdata2.length)
 	if(rawdata2.length>0)
@@ -34,11 +41,11 @@ module.exports =async(client) =>{
 		member_id = JSON.parse(rawdata2);
 	}
 	
-
+	//on parcours les membres que nous retourne l'api discord
 	var users = client.users.cache;
 	for(let usr of users.values())
 	{
-		//console.log(member_id[usr.id]);
+		//si le joueur n'existe pas on le crée
 		if(typeof (member_id[usr.id]) === "undefined")
 		{
 			member_id[usr.id]={};
@@ -54,8 +61,9 @@ module.exports =async(client) =>{
 		}
 
 	}
-
+	//transformation en json stockable
 	let data_members = JSON.stringify(member_id,null, 2);
+	//ecriture du fichier JSON
 	fs.writeFileSync('./db/members.json', data_members);
 
 

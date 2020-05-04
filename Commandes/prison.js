@@ -1,8 +1,5 @@
 const Discord = require ("discord.js");
 module.exports.run = async (client,message, args) =>{
-	//const membre= message.mentions.members.first() || message.member;
-	//message.member
-	//message.channel
 	message.author.send({
 		embed:{
 			color: 3447003,

@@ -1,5 +1,5 @@
 const Discord = require ("discord.js");
-
+//si la commande kick arrive
 module.exports.run = async(client,message,args) =>{
 
 	console.log('kick demandé');
@@ -29,14 +29,6 @@ module.exports.run = async(client,message,args) =>{
 
 	message.channel.send(`${member.user.username} est kick par ${message.author.username}, pour la raison suivante ${raison}`);
 	message.mentions.users.first().send(`${member.user.username}, Vous avez été expulsé du serveur **${message.guild.name} par ${message.author.username}, pour la raison suivante '${raison}'`);
-	/*kick.kick().then(member =>{
-		 message.channel.send(`${member.user.username} est kick par ${message.author.username}`);
-		 message.mentions.users.first().send(`${member.user.username}, Vous avez été expulsé du serveur **${message.guild.name} par ${message.author.username}`);
-
-		})*/
-		
-
-
 	};
 
 	module.exports.help ={

@@ -1,5 +1,5 @@
 const Discord = require ("discord.js");
-
+//si la commande kill arrive, (kick un peu plus soft, déplace avers un salon AFK)
 module.exports.run = async(client,message,args) =>{
 
 	console.log('kill demandé');
@@ -28,7 +28,7 @@ module.exports.run = async(client,message,args) =>{
 	raison = message.content.replace('+kill', '');
 	raison = raison.replace(message.mentions.users.first(), '');
 
-	//const m = await message.channel.send('Bonne nuit '+message.member.displayName);
+	//on déplace le memebre vers le salon avec l'id 597787997936549899
 	kill.voice.setChannel('597787997936549899')
 
 	message.channel.send(`${member.user.username} est kick par ${message.author.username}, pour la raison suivante ${raison}`);

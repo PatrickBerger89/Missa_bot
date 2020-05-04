@@ -19,16 +19,13 @@ module.exports.run = async(client,message,args) =>{
 			json_data.forEach((ship)=>{
 				let new_line="ID: "+ship.id+"\n"+"> *Marque* :"+ship.man+"\n > *Nom* :    "+ship.name+"\n > *Emport* :    "+ship.emport+"\n\n";
 				
-				//console.log("total: ");
-				//console.log(list_ship.length);
-				//console.log("new_line: ");
-				//console.log(new_line.length);
-				
+				//si le message fait moins de 2000 caractére
 				if((new_line.length+list_ship.length)<2000)
 				{
 					list_ship=list_ship+""+new_line;
 					text[mes_test]=list_ship;
 				}
+				//sinon on prépare un nouveau bloc message
 				else
 				{
 					list_ship="";
@@ -37,9 +34,8 @@ module.exports.run = async(client,message,args) =>{
 					text[mes_test]=list_ship;
 				}
 			})
-
+			//envoie de plusieurs message en fonction du nombre de fois que les 2000 ont été dépassé
 			text.forEach((bloc)=>{
-			//console.log(bloc.length)
 			message.author.send(bloc);
 
 		})

@@ -1,5 +1,6 @@
 const Discord = require ("discord.js");
 
+//si la commande clear est appelé
 module.exports.run = async(client,message,args) =>{
 	console.log('clear demandé');
 
@@ -17,7 +18,7 @@ module.exports.run = async(client,message,args) =>{
 	{
 		return message.author.send("Vous n'avez spécifiez un nombre réelle");
 	}
-
+	//destruction de x message
 	message.channel.bulkDelete(args[0])
 
 };
