@@ -14,6 +14,9 @@ const sqlite = require("./../class/db.js")
 module.exports =async(client) =>{
 	client.user.setPresence({activity:{name:"Ré écriture compléte du core du robot"}});
 
+	//ouverture
+	console.log(await sqlite.open('./db/db_bot.sql3'));
+
 	//on charge les données salons stocké sur fichier
 	let rawdata = fs.readFileSync('./db/salons.json');
 	console.log(rawdata.length)
@@ -26,17 +29,33 @@ module.exports =async(client) =>{
 	var channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
-		console.log(await sqlite.open('./db/db_bot.sql3'));
-
+		
+		//on recherche ce salon dans la base de donnée
 		sql = "SELECT * FROM salons WHERE id=?"
 		r = await sqlite.all(sql, channel["id"])
-		r.forEach(function(row) {
-			console.log("Read:", row.id, row.name, row.type)    
-		})
 
-		console.log("One by one:")
+		console.log(r.length)
 
-		sqlite.close();
+		//si dans la réponse il y a des élément, on fait une mise à jours de principe
+		if(r.length>0)
+		{
+			var sql = "UPDATE salons set id ='"+channel['id']+"', name ='"+channel['name']+"', type ='"+channel['type']+"' WHERE id ='"+channel['id']+"'"
+			
+			console.log(sql)
+			r = await sqlite.run(sql)
+			console.log(r)
+			if(r) console.log("Mis à jours.")
+		}
+		//sinon on crée le salons dans la base de données
+		else
+		{
+			var entry = `'${channel["id"]}','${channel["name"]}','${channel["type"]}'`
+			var sql2 = "INSERT INTO salons (id, name, type) VALUES (" + entry + ")"
+			r = await sqlite.run(sql2)
+			if(r) console.log("Insertions")
+		}
+
+		//console.log("One by one:")
 
 		//si le salon n'est pas une catégorie
 		if(channel["type"]!=="category")
@@ -66,6 +85,24 @@ module.exports =async(client) =>{
 	var users = client.users.cache;
 	for(let usr of users.values())
 	{
+		//on recherche ce salon dans la base de donnée
+		sql = "SELECT * FROM members WHERE id=?"
+		r = await sqlite.all(sql, usr['id'])
+
+		console.log(r.length)
+		console.log(r)
+
+		//si la réponse est vide, le membre
+		if(r.length==0)
+		{
+			var entry = `'${usr['id']}','${usr.username}','${Date.now()}','out','inc','inc','0','5'`
+			var sql2 = "INSERT INTO members (id, name, time, salon, game , type , alert ,jeton ) VALUES (" + entry + ")"
+			console.log(sql2)
+			r = await sqlite.run(sql2)
+			if(r) console.log("Insertions")
+		}
+		
+
 		//si le joueur n'existe pas on le crée
 		if(typeof (member_id[usr.id]) === "undefined")
 		{
@@ -90,4 +127,5 @@ module.exports =async(client) =>{
 
 
 	console.log('Ready to fight');
+	sqlite.close();
 };

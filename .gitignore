@@ -3,4 +3,5 @@ config.json
 *.mp3
 
 db/db_bot.sql3
-
+db/salons.json
+db/members.json
