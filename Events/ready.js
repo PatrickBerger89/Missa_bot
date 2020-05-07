@@ -1,6 +1,15 @@
 //lancement de la lib de lecture distante
 const fs=require('fs');
 
+//chargement de la lib mysql_lite3
+var sqlite3 = require('sqlite3').verbose();
+
+//récupération de l'objet db
+//let dbo = require('./../class/dbo.js');
+
+const sqlite = require("./../class/db.js")
+
+
 //si un event on ready arrive arrive (le boot a démarré et s'est connecté avec succés)
 module.exports =async(client) =>{
 	client.user.setPresence({activity:{name:"Ré écriture compléte du core du robot"}});
@@ -17,6 +26,18 @@ module.exports =async(client) =>{
 	var channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
+		console.log(await sqlite.open('./db/db_bot.sql3'));
+
+		sql = "SELECT * FROM salons WHERE id=?"
+		r = await sqlite.all(sql, channel["id"])
+		r.forEach(function(row) {
+			console.log("Read:", row.id, row.name, row.type)    
+		})
+
+		console.log("One by one:")
+
+		sqlite.close();
+
 		//si le salon n'est pas une catégorie
 		if(channel["type"]!=="category")
 		{

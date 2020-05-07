@@ -25,16 +25,10 @@
   },
   "704788656896081990": {
     "type": "voice",
-    "name": "test arrivée"
+    "name": "test arrivée musique"
   },
   "706790312441413663": {
     "type": "voice",
     "name": "test_vocal missa"
-  },
-  "706397007681421383": {
-    "type": "dm"
-  },
-  "705835472722591804": {
-    "type": "dm"
   }
 }

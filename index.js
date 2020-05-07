@@ -7,6 +7,10 @@ var ready=false;
 //lancement de la lib de lecture distante
 const fs=require('fs');
 
+//récupération de l'objet db
+//let dbo = require('./class/dbo.js');
+
+
 //lancement de la lib youtube
 const ytdl = require('ytdl-core');
 global.queue = new Map();
