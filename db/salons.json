@@ -1,4 +1,20 @@
 {
+  "704432846755987499": {
+    "type": "text",
+    "name": "général"
+  },
+  "704432846755987500": {
+    "type": "voice",
+    "name": "Général"
+  },
+  "704718875312259116": {
+    "type": "voice",
+    "name": "Je reviens,             ou pas"
+  },
+  "705683831247601665": {
+    "type": "voice",
+    "name": "Bienvenue"
+  },
   "704729073976606833": {
     "type": "text",
     "name": "général"
@@ -15,7 +31,10 @@
     "type": "voice",
     "name": "test_vocal missa"
   },
-  "706790920758100059": {
+  "706397007681421383": {
+    "type": "dm"
+  },
+  "705835472722591804": {
     "type": "dm"
   }
 }
