@@ -5,8 +5,6 @@ const fs=require('fs');
 var sqlite3 = require('sqlite3').verbose();
 
 //récupération de l'objet db
-//let dbo = require('./../class/dbo.js');
-
 const sqlite = require("./../class/db.js")
 
 
@@ -85,7 +83,7 @@ module.exports =async(client) =>{
 	var users = client.users.cache;
 	for(let usr of users.values())
 	{
-		//on recherche ce salon dans la base de donnée
+		//on recherche ce membre dans la base de donnée
 		sql = "SELECT * FROM members WHERE id=?"
 		r = await sqlite.all(sql, usr['id'])
 
