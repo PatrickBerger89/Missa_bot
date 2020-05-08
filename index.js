@@ -1,17 +1,16 @@
 //lancement de la lib discord
 const Discord = require('discord.js')
 
+//connexion à discord central et répercution sur les serveurs autorisé
+const client = new Discord.Client()
+
 //état de l'initialisation du bot
 var ready=false;
 
 //lancement de la lib de lecture distante
 const fs=require('fs');
 
-//récupération de l'objet db
-//let dbo = require('./class/dbo.js');
-
-
-//lancement de la lib youtube
+//lancement et création des variable de la lib youtube
 const ytdl = require('ytdl-core');
 global.queue = new Map();
 global.serverQueue ;
@@ -19,23 +18,31 @@ global.serverQueue ;
 //récupération de la configuration
 const config  =  require ( "./config.json" ) ;
 
-//connexion à discord central et répercution sur les serveurs autorisé
-const client = new Discord.Client()
 
-//initialisation du bot
+
+//initialisation du bot sur les serveurs abonné
 client.login(config.token)
 
 //variable permettant ou pas à missa de rester dans un salon à la fin d'une lecture
 global.standby=false;
 
-global.salons={};
+//tableau qui contiendra tous les salons
+global.salon_list={};
+
+//tableau qui contiendra tous les son de la commande rh
 global.sound_list=[];
-global.member_id={};
+
+//tableau qui contiendra tous les membres
+global.monkeys_list={};
+
+//id du salon ou seront déplacé les joueurs à calmer quelque instant
+global.salon_kill='597787997936549899';
 
 //liste des salons où missa lancera le théme avenger
-global.salon_auto_play=["704788656896081990","704432846755987500"];//704432846755987500
+global.salon_auto_play=["704788656896081990","704432846755987500"];
+
 //liste des salons où missa souhaitera la bienvenue
-global.salon_auto_says=["705683831247601665","706790312441413663"];//705683831247601665
+global.salon_auto_says=["705683831247601665","706790312441413663"];
 
 
 
@@ -86,47 +93,47 @@ rep_mp3.forEach((rep)=>{
 
 //prototype de fonction permettant d'agir si un membre de fait pas le bon jeux dans un salon réservé à un jeu spécifique
 setInterval(function() {
-	/*for (const property in member_id)
+	/*for (const property in monkeys_list)
 	{
-		if (member_id[property].game!=="inc" && member_id[property].salon!=="inc")
+		if (monkeys_list[property].game!=="inc" && monkeys_list[property].salon!=="inc")
 		{
-			if(member_id[property].salon==="702600937369370624" && member_id[property].game!=="Star Citizen")
+			if(monkeys_list[property].salon==="702600937369370624" && monkeys_list[property].game!=="Star Citizen")
 			{
-				member_id[property].alert++;
+				monkeys_list[property].alert++;
 
 				
 				let users = client.users.cache;
 				console.log(client.users);
 				let user=users.get(property);
 
-				if(member_id[property].alert==1)
+				if(monkeys_list[property].alert==1)
 				{
 					user.send("Attention, vous êtes dans un salon réservé aux joueurs de Star Citizen, mais votre jeux n'est pas actif. Premier avertissement.");
-					member_id[property].time = Date.now();
-					member_id[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+					monkeys_list[property].time = Date.now();
+					monkeys_list[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 				}
-				if(member_id[property].alert==12)
+				if(monkeys_list[property].alert==12)
 				{
 					user.send("Attention, vous êtes dans un salon réservé aux joueurs de Star Citizen, mais votre jeux n'est pas actif.");
-					member_id[property].time = Date.now();
-					member_id[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+					monkeys_list[property].time = Date.now();
+					monkeys_list[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 				}
-				if(member_id[property].alert==24)
+				if(monkeys_list[property].alert==24)
 				{
 					user.send("Attention, vous êtes dans un salon réservé aux joueurs de Star Citizen, mais votre jeux n'est pas actif. Dernier avertissement.");
-					member_id[property].time = Date.now();
-					member_id[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+					monkeys_list[property].time = Date.now();
+					monkeys_list[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 				}
-				if(member_id[property].alert==36)
+				if(monkeys_list[property].alert==36)
 				{
 					user.send("Attention, vous êtes dans un salon réservé aux joueurs de Star Citizen, mais votre jeux n'était pas actif. Expulsion du channel.");
-					member_id[property].time = Date.now();
-					member_id[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+					monkeys_list[property].time = Date.now();
+					monkeys_list[property].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 				}
 			}
-			if(member_id[property].salon==="702600937369370624" && member_id[property].game==="Star Citizen")
+			if(monkeys_list[property].salon==="702600937369370624" && monkeys_list[property].game==="Star Citizen")
 			{
-				member_id[property].alert=0;
+				monkeys_list[property].alert=0;
 			}
 		}
 	}*/
@@ -135,63 +142,113 @@ setInterval(function() {
 
 //mise à jours de la base de données des salons et membres
 setInterval(function() {
+	/*//chargement de la lib mysql_lite3
+	var sqlite3 = require('sqlite3').verbose();
+
+	//récupération de l'objet db
+	const sqlite = require("./class/db.js")
+
+	//récupération de l'objet monkey
+	const monkeys = require("./class/monkey.js")
+
+	//récupération de l'objet monkey
+	const salons_m = require("./class/salon.js")
+
 	//parcours des salons
-	var channels = client.channels.cache;
+	let channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
-		//si le salon n'est pas une catégorie
-		if(channel["type"]!=="category")
-		{
-			//on prépare le tableau à stocker
-			salons[channel["id"]]={};
-			salons[channel["id"]].type=channel["type"];
-			salons[channel["id"]].name=channel["name"];
-			salons[channel["id"]].name=channel["name"];
-		}
-	}
-	//transformation en json stockable
-	var data_salons = JSON.stringify(salons,null, 2);
-	//ecriture du fichier JSON
-	fs.writeFileSync('./db/salons.json', data_salons);
+		//on prépare l'objet monkeys
+		let salon= new salons_m();
+		console.log("salon : "+salon)
+		
+		//on recherche un correspondance avec un salon existant
+		let info = await salon.search_s(channel["id"]).then()
+	/*	//si le salon n'exsite pas on le créé
+		if( info === null){result = await salon.create_s(channel).then();}
+		//sinon on le met à jours de toute façon
+		else{result = await salon.update_s(channel).then();}
 
+		salon_list[channel["id"]]=salon;
+
+		//console.log(salon[channel["id"]]);
+	*//*}
+/*
+	let users = client.users.cache;
+	for(let usr of users.values())
+	{
+		//on prépare l'objet monkeys
+		let monkey= new monkeys();
+		
+		//on recherche un correspondance avec un utilisateur existant
+		info = await monkey.search_m(usr['id']).then()
+		if( info === null)
+		{
+			result = await monkey.create_m(usr).then()
+			console.log(result)
+		}
+		else
+		{
+			if(monkeys_list[usr.id].jeton < 5)
+			{
+				monkeys_list[usr.id].jeton++;
+				monkeys_list[usr.id].time = Date.now();
+				monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+			}
+
+			console.log(info)
+		}
+
+		monkeys_list[usr.id]=monkey;
+
+
+		
+	}
+*/
+	//transformation en json stockable
+	//var data_salons = JSON.stringify(salons,null, 2);
+	//ecriture du fichier JSON
+	//fs.writeFileSync('./db/salons.json', data_salons);
+	/*
 	//parcours des utilisateur
 	var users = client.users.cache;
 	for(let usr of users.values())
 	{
 		//si le membre n'existe pas, on lui crée une nouvelle fiche
-		if(typeof (member_id[usr.id]) === undefined)
+		if(typeof (monkeys_list[usr.id]) === undefined)
 		{
 			//console.log(usr.username);
 			//on prépare le tableau à stocker
-			member_id[usr.id]={};
-			member_id[usr.id].id = usr['id'];
-			member_id[usr.id].name = usr.username;
-			member_id[usr.id].salon = "inc";;
-			member_id[usr.id].game = "inc";
-			member_id[usr.id].type = "inc";
-			member_id[usr.id].time = Date.now();
-			member_id[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-			member_id[usr.id].alert = 0;
-			member_id[usr.id].jeton = 5;
+			monkeys_list[usr.id]={};
+			monkeys_list[usr.id].id = usr['id'];
+			monkeys_list[usr.id].name = usr.username;
+			monkeys_list[usr.id].salon = "inc";;
+			monkeys_list[usr.id].game = "inc";
+			monkeys_list[usr.id].type = "inc";
+			monkeys_list[usr.id].time = Date.now();
+			monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+			monkeys_list[usr.id].alert = 0;
+			monkeys_list[usr.id].jeton = 5;
 		}
 		//sinon on mets sa fiche à jours
 		else{
-			//if(member_id[usr.id].hasOwnProperty('jeton'))
+			//if(monkeys_list[usr.id].hasOwnProperty('jeton'))
 			//{
-				if(member_id[usr.id].jeton < 5)
+				if(monkeys_list[usr.id].jeton < 5)
 				{
-					member_id[usr.id].jeton++;
-					member_id[usr.id].time = Date.now();
-					member_id[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+					monkeys_list[usr.id].jeton++;
+					monkeys_list[usr.id].time = Date.now();
+					monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 				}
 			//}
 			
 		}
 	}
 	//transformation en json stockable
-	var data_members = JSON.stringify(member_id,null, 2);
+	var data_members = JSON.stringify(monkeys_list,null, 2);
 	//ecriture du fichier JSON
 	fs.writeFileSync('./db/members.json', data_members);
 	//console.log('BD mise à jours');
+	*/
 }, 60000);
 

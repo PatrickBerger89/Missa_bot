@@ -28,8 +28,8 @@ module.exports.run = async(client,message,args) =>{
 	raison = message.content.replace('+kill', '');
 	raison = raison.replace(message.mentions.users.first(), '');
 
-	//on déplace le memebre vers le salon avec l'id 597787997936549899
-	kill.voice.setChannel('597787997936549899')
+	//on déplace le membre vers le salon afk définis par salon_kill
+	kill.voice.setChannel(salon_kill)
 
 	message.channel.send(`${member.user.username} est kick par ${message.author.username}, pour la raison suivante ${raison}`);
 		 message.mentions.users.first().send(`${member.user.username}, Vous avez été expulsé du serveur **${message.guild.name} par ${message.author.username}, pour la raison suivante '${raison}'`);

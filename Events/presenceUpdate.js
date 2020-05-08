@@ -1,4 +1,11 @@
+//chargement de la lib mysql_lite3
+var sqlite3 = require('sqlite3').verbose();
 
+//récupération de l'objet db
+const sqlite = require("./../class/db.js")
+
+//récupération de l'objet monkey
+const monkeys = require("./../class/monkey.js")
 
 //si un event presence update arrive (le joueur à fait quelque chose)
 module.exports = async(client,oldPresence, newPresence)=>{
@@ -23,13 +30,13 @@ module.exports = async(client,oldPresence, newPresence)=>{
 					old_users_data=old_users_data.get(oldPresence.userID);
 
 					//si le joueur n'as pas changé son peudo, nickname n'exsite pas, il faut utilisé username					
-					if(oldPresence.member.nickname !== null && member_id[oldPresence.userID].game!=="inc")
+					if(oldPresence.member.nickname !== null && monkeys_list[oldPresence.userID].game!=="inc")
 					{
 						console.log(oldPresence.member.nickname+" a quité l'activitée : "+activity.name);
 					}
 					else
 					{
-						if (member_id[oldPresence.userID].game!== "inc")
+						if (monkeys_list[oldPresence.userID].game!== "inc")
 						{
 							console.log(old_users_data.username+" a quité l'activitée : "+activity.name);
 						}
@@ -58,25 +65,43 @@ module.exports = async(client,oldPresence, newPresence)=>{
 					let new_users_data = client.users.cache;
 					new_users_data=new_users_data.get(newPresence.userID);
 
-					if(newPresence.member.nickname !== null && member_id[newPresence.userID].game!=="inc")
+					if(newPresence.member.nickname !== null && monkeys_list[newPresence.userID].game!=="inc")
 					{
 						console.log(newPresence.member.nickname+" a commencé l'activitée : "+activity.name);
 					}
 					else
 					{
-						if (member_id[newPresence.userID].game!== "inc")
+						if (monkeys_list[newPresence.userID].game!== "inc")
 						{
 							console.log(new_users_data.username+" a commencé l'activitée : "+activity.name);
 						}
 					}
-					//si le joueur est dans la BD on met à jour ses informations jeux
-					if(newPresence.userID in member_id)
+
+					//on prépare l'objet monkeys
+					let monkey= new monkeys();
+
+					//on recherche un correspondance avec un utilisateur existant
+					let info = await monkey.search_m(newPresence.userID).then()
+					//si le membre n'existe pas, on le créé immédiatement
+					if( info === null)
 					{
-						member_id[newPresence.userID].type=activity.type;
-						member_id[newPresence.userID].game=activity.name;
-						member_id[newPresence.userID].time = Date.now();
-						member_id[newPresence.userID].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+						result = await monkey.create_m(usr).then()
+						console.log(`création du membre ${usr['username']}`)
 					}
+
+
+					//creation du tableau de mise à jour
+					let new_data={};
+					new_data.type=activity.type;
+					new_data.game=activity.name;
+					new_data.time = Date.now();
+					new_data.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+
+					//mise à jour des donnée du membres
+					info = await monkey.update_m(new_data).then()
+
+					monkeys_list[newPresence.userID]=monkey;
+
 				}
 			}
 		}

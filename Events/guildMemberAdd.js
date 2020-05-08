@@ -8,31 +8,25 @@ const sqlite = require("./../class/db.js")
 
 module.exports = async(member)=>{
 
-	//ouverture de la base de donnée
-	console.log(await sqlite.open('./db/db_bot.sql3'));
-
 	//on parcours les membres que nous retourne l'api discord
 	var users = member.users.cache;
 	for(let usr of users.values())
 	{
-		//on recherche ce membre dans la base de donnée
-		sql = "SELECT * FROM members WHERE id=?"
-		r = await sqlite.all(sql, usr['id'])
 
-		console.log(r.length)
-		console.log(r)
-
-		//si la réponse est vide, le membre
-		if(r.length==0)
+		//on prépare l'objet monkeys
+		let monkey= new monkeys();
+		
+		//on recherche un correspondance avec un utilisateur existant
+		info = await monkey.search_m(usr['id']).then()
+		if( info === null)
 		{
-			var entry = `'${usr['id']}','${usr.username}','${Date.now()}','out','inc','inc','0','5'`
-			var sql2 = "INSERT INTO members (id, name, time, salon, game , type , alert ,jeton ) VALUES (" + entry + ")"
-			console.log(sql2)
-			r = await sqlite.run(sql2)
-			if(r) console.log("Insertions")
+			result = await monkey.create_m(usr).then();
+			monkeys_list[usr.id]=monkey;
+			console.log(result);
+		}
+		else
+		{
+			console.log(info)
 		}
 	}
-
-	sqlite.close();
-
 };

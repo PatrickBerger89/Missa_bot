@@ -1,4 +1,15 @@
 var googleTTS = require('google-tts-api');
+
+//chargement de la lib mysql_lite3
+var sqlite3 = require('sqlite3').verbose();
+
+//récupération de l'objet db
+const sqlite = require("./../class/db.js")
+
+//récupération de l'objet monkey
+const monkeys = require("./../class/monkey.js")
+
+
 module.exports = async(client,oldMember, newMember)=>{
 
 	let last_channel_id="";
@@ -8,24 +19,24 @@ module.exports = async(client,oldMember, newMember)=>{
 		//on vérifie que le channel id exsite, sinon le joueur vient de faire une connection au serveur
 		if(oldMember.channel!==null)
 		{
-			if(oldMember.member.nickname !== null && member_id[oldMember.id].salon!=="out")
+			if(oldMember.member.nickname !== null && monkeys_list[oldMember.id].salon!=="out")
 			{
-				console.log(oldMember.member.nickname+" est sortie du  salon : "+salon[member_id[oldMember.id].salon].name);
+				console.log(oldMember.member.nickname+" est sortie du  salon : "+salon_list[monkeys_list[oldMember.id].salon].name);
 			}
 
 			else
 			{
-				if (member_id[oldMember.id].salon!== "out")
+				if (monkeys_list[oldMember.id].salon!== "out")
 				{
-					console.log(oldMember.member.user.username+" est sortie du  salon : "+salon[member_id[oldMember.id].salon].name);
+					console.log(oldMember.member.user.username+" est sortie du  salon : "+salon_list[monkeys_list[oldMember.id].salon].name);
 				}
 			}
 
 			//on mémorise d'ou vient de partir le membre
 			last_channel_id=oldMember.channel.id;
 		}
-
 	}
+
 	//si l'on détecte un mouvement de rentré de salon
 	if(newMember)
 	{
@@ -35,26 +46,41 @@ module.exports = async(client,oldMember, newMember)=>{
 			//si l'id de lancien channel et bien différent du nouveau, c'est qu'il s'agit d'un mouvement réelle
 			if(last_channel_id !== newMember.channel.id)
 			{
-				//si le joueur est dans la BD
-				if(newMember.id in member_id)
+				//on prépare l'objet monkeys
+				let monkey= new monkeys();
+
+				//on recherche un correspondance avec un utilisateur existant
+				let info = await monkey.search_m(newMember.id).then()
+				//si le membre n'existe pas, on le créé immédiatement
+				if( info === null)
 				{
-					//on mémorise la nouvelle position du joueur
-					member_id[newMember.id].salon=newMember.channel.id;
-					member_id[newMember.id].time = Date.now();
-					member_id[newMember.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-
-
-					//si le joueur avait définis un pseudo
-					if(newMember.member.nickname !== null)
-					{
-						console.log(newMember.member.nickname+" est entré dans le du  salon : "+salon[member_id[newMember.id].salon].name)
-					}
-
-					else
-					{
-						console.log(newMember.member.user.username+" est entré dans le du  salon : "+salon[member_id[newMember.id].salon].name)
-					}
+					result = await monkey.create_m(usr).then()
+					console.log(`création du membre ${usr['username']}`)
 				}
+
+
+				//creation du tableau de mise à jour
+				let new_data={};
+				new_data.salon=newMember.channel.id;
+				new_data.time = Date.now();
+				new_data.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+
+				//mise à jour des donnée du membres
+				info = await monkey.update_m(new_data).then()
+
+				monkeys_list[newMember.id]=monkey;
+
+				//si le joueur avait définis un pseudo
+				if(newMember.member.nickname !== null)
+				{
+					console.log(newMember.member.nickname+" est entré dans le du  salon : "+salon_list[monkeys_list[newMember.id].salon].name)
+				}
+
+				else
+				{
+					console.log(newMember.member.user.username+" est entré dans le du  salon : "+salon_list[monkeys_list[newMember.id].salon].name)
+				}
+				
 
 				//si le membre rentre dans un salon vocal où il doit être accueillit pas une musique
 				if(salon_auto_play.includes(newMember.channel.id))
@@ -93,25 +119,45 @@ module.exports = async(client,oldMember, newMember)=>{
 			}
 		}
 		else
-		{ //si le joueur est dans la BD
-			if(newMember.id in member_id)
+		{ 
+			//on prépare l'objet monkeys
+			let monkey= new monkeys();
+
+			//on recherche un correspondance avec un utilisateur existant
+			let info = await monkey.search_m(newMember.id).then()
+			//si le membre n'existe pas, on le créé immédiatement
+			if( info === null)
 			{
-				//si le joueur avait définis un pseudo
-				if(newMember.member.nickname !== null)
-				{
-					console.log("Le joueur "+newMember.member.nickname+" s'est déconnecté.")
-				}
-
-				else
-				{
-					console.log("Le joueur "+newMember.member.user.username+" s'est déconnecté.")
-				}
-
-				//on mémorise la nouvelle position du joueur
-				member_id[newMember.id].salon="out";
-				member_id[newMember.id].time = Date.now();
-				member_id[newMember.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+				result = await monkey.create_m(usr).then()
+				console.log(`création du membre ${usr['username']}`)
 			}
+
+
+			//creation du tableau de mise à jour
+			let new_data={};
+			new_data.salon="out";
+			new_data.time = Date.now();
+			new_data.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+
+			//mise à jour des donnée du membres
+			info = await monkey.update_m(new_data).then()
+
+
+
+			monkeys_list[newMember.id]=monkey;
+
+
+			//si le joueur avait définis un pseudo
+			if(newMember.member.nickname !== null)
+			{
+				console.log("Le joueur "+newMember.member.nickname+" s'est déconnecté.")
+			}
+
+			else
+			{
+				console.log("Le joueur "+newMember.member.user.username+" s'est déconnecté.")
+			}
+
 		}
 	}
 };

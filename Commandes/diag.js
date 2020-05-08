@@ -5,7 +5,7 @@ module.exports.run = async(client,message,args) =>{
 	console.log('diag demandé');
 
 	console.log(member_id);
-	console.log(salons);
+	console.log(monkeys_list);
 	
 
 };
