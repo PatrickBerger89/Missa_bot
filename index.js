@@ -18,6 +18,18 @@ global.serverQueue ;
 //récupération de la configuration
 const config  =  require ( "./config.json" ) ;
 
+//chargement de la lib mysql_lite3
+var sqlite3 = require('sqlite3').verbose();
+
+//récupération de l'objet db
+const sqlite = require("./class/db.js")
+
+//récupération de l'objet monkey
+const monkeys = require("./class/monkey.js")
+
+//récupération de l'objet monkey
+const salons_m = require("./class/salon.js")
+
 
 
 //initialisation du bot sur les serveurs abonné
@@ -141,30 +153,19 @@ setInterval(function() {
 
 
 //mise à jours de la base de données des salons et membres
-setInterval(function() {
-	/*//chargement de la lib mysql_lite3
-	var sqlite3 = require('sqlite3').verbose();
-
-	//récupération de l'objet db
-	const sqlite = require("./class/db.js")
-
-	//récupération de l'objet monkey
-	const monkeys = require("./class/monkey.js")
-
-	//récupération de l'objet monkey
-	const salons_m = require("./class/salon.js")
-
+setInterval(async function() {
+	
 	//parcours des salons
 	let channels = client.channels.cache;
 	for(let channel of channels.values())
 	{
 		//on prépare l'objet monkeys
 		let salon= new salons_m();
-		console.log("salon : "+salon)
+		//console.log("salon : "+salon)
 		
 		//on recherche un correspondance avec un salon existant
 		let info = await salon.search_s(channel["id"]).then()
-	/*	//si le salon n'exsite pas on le créé
+		//si le salon n'exsite pas on le créé
 		if( info === null){result = await salon.create_s(channel).then();}
 		//sinon on le met à jours de toute façon
 		else{result = await salon.update_s(channel).then();}
@@ -172,83 +173,36 @@ setInterval(function() {
 		salon_list[channel["id"]]=salon;
 
 		//console.log(salon[channel["id"]]);
-	*//*}
-/*
+	}
+
 	let users = client.users.cache;
 	for(let usr of users.values())
 	{
-		//on prépare l'objet monkeys
-		let monkey= new monkeys();
-		
-		//on recherche un correspondance avec un utilisateur existant
-		info = await monkey.search_m(usr['id']).then()
-		if( info === null)
+		if(monkeys_list[usr.id].jeton<5)
 		{
-			result = await monkey.create_m(usr).then()
-			console.log(result)
-		}
-		else
-		{
-			if(monkeys_list[usr.id].jeton < 5)
+			//on prépare l'objet monkeys
+			let monkey= new monkeys();
+
+			//on recherche un correspondance avec un utilisateur existant
+			let info = await monkey.search_m(usr.id).then()
+			//si le membre n'existe pas, on le créé immédiatement
+			if( info === null)
 			{
-				monkeys_list[usr.id].jeton++;
-				monkeys_list[usr.id].time = Date.now();
-				monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+				result = await monkey.create_m(usr).then()
+				console.log(`création du membre ${usr.id}`)
 			}
+			//creation du tableau de mise à jour
+			let new_data={};
+			let jeton=monkeys_list[usr.id].jeton+1;
+			new_data.jeton=jeton;
+			new_data.time = Date.now();
+			new_data.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 
-			console.log(info)
+			//mise à jour des donnée du membres
+			info = await monkey.update_m(new_data).then()
+			monkeys_list[usr.id]=monkey;
 		}
-
-		monkeys_list[usr.id]=monkey;
-
-
 		
 	}
-*/
-	//transformation en json stockable
-	//var data_salons = JSON.stringify(salons,null, 2);
-	//ecriture du fichier JSON
-	//fs.writeFileSync('./db/salons.json', data_salons);
-	/*
-	//parcours des utilisateur
-	var users = client.users.cache;
-	for(let usr of users.values())
-	{
-		//si le membre n'existe pas, on lui crée une nouvelle fiche
-		if(typeof (monkeys_list[usr.id]) === undefined)
-		{
-			//console.log(usr.username);
-			//on prépare le tableau à stocker
-			monkeys_list[usr.id]={};
-			monkeys_list[usr.id].id = usr['id'];
-			monkeys_list[usr.id].name = usr.username;
-			monkeys_list[usr.id].salon = "inc";;
-			monkeys_list[usr.id].game = "inc";
-			monkeys_list[usr.id].type = "inc";
-			monkeys_list[usr.id].time = Date.now();
-			monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-			monkeys_list[usr.id].alert = 0;
-			monkeys_list[usr.id].jeton = 5;
-		}
-		//sinon on mets sa fiche à jours
-		else{
-			//if(monkeys_list[usr.id].hasOwnProperty('jeton'))
-			//{
-				if(monkeys_list[usr.id].jeton < 5)
-				{
-					monkeys_list[usr.id].jeton++;
-					monkeys_list[usr.id].time = Date.now();
-					monkeys_list[usr.id].date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-				}
-			//}
-			
-		}
-	}
-	//transformation en json stockable
-	var data_members = JSON.stringify(monkeys_list,null, 2);
-	//ecriture du fichier JSON
-	fs.writeFileSync('./db/members.json', data_members);
-	//console.log('BD mise à jours');
-	*/
 }, 60000);
 
