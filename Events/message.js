@@ -1,6 +1,17 @@
 const config  =  require ( "./../config.json" );
 const prefix= config.prefix;
 
+//chargement de la lib mysql_lite3
+var sqlite3 = require('sqlite3').verbose();
+
+//récupération de l'objet db
+const sqlite = require("./../class/db.js")
+
+//récupération de l'objet monkey
+const monkeys = require("./../class/monkey.js")
+
+
+
 //si un event client.message arrive
 module.exports = async(client,message)=>{
 
@@ -53,24 +64,24 @@ module.exports = async(client,message)=>{
 			//mise à jour des donnée du membres
 			info = await monkey.update_m(new_data).then()
 
-			monkeys_list[newMember.id]=monkey;
+			monkeys_list[message.author.id]=monkey;
 
-				//monkeys_list[message.author.id].jeton--;
-			}
-			serverQueue = queue.get(message.guild.id);
-			if(!args[0] && commande==='play')
-			{
-				return message.channel.send("Vous n'avez spécifiez pas d'adresse youtube à lire");
-			}else
-			{
-				cmd.run(message,serverQueue);
-			}
-
+			//monkeys_list[message.author.id].jeton--;
 		}
-		else
+		serverQueue = queue.get(message.guild.id);
+		if(!args[0] && commande==='play')
 		{
-			cmd.run(client,message,args);
+			return message.channel.send("Vous n'avez spécifiez pas d'adresse youtube à lire");
+		}else
+		{
+			cmd.run(message,serverQueue);
 		}
 
+	}
+	else
+	{
+		cmd.run(client,message,args);
+	}
 
-	};
+
+};

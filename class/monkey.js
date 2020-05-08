@@ -61,7 +61,7 @@ module.exports= class monkey {
 		for (var k in data){entry +=`, ${k} = '${data[k]}'`;}
 
 		var sql = `UPDATE members SET ${entry} WHERE id= '${this.id}'`
-		console.log(sql)
+		//console.log(sql)
 
 		var r = await sqlite.run(sql)
 

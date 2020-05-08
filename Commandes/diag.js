@@ -4,7 +4,7 @@ const Discord = require ("discord.js");
 module.exports.run = async(client,message,args) =>{
 	console.log('diag demandé');
 
-	console.log(member_id);
+	console.log(salon_list);
 	console.log(monkeys_list);
 	
 
