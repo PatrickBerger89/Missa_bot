@@ -21,9 +21,9 @@ module.exports.run = async (client,message,args) =>{
 	}
 	console.log();
 
-	if(salon_kill[message.author.id].jeton>0)
+	if(monkeys_list[message.author.id].jeton>0)
 	{
-		salon_kill[message.author.id].jeton--;
+		monkeys_list[message.author.id].jeton--;
 
 		voiceChannel.join()
 		.then(connection => {

@@ -17,7 +17,7 @@ module.exports = async(client,message)=>{
 
 	const cmd = client.commands.get(commande);
 	
-	console.log(`L'utilisateur ${member_id[message.author.id].name} à fait appel à la commande : ${commande} , arguments ${args} à ${new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')}`)
+	console.log(`L'utilisateur ${monkeys_list[message.author.id].name} à fait appel à la commande : ${commande} , arguments ${args} à ${new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')}`)
 	message.delete();
 
 	//si la commande n'exsite pas
@@ -30,22 +30,47 @@ module.exports = async(client,message)=>{
 		if(commande==='play')
 		{
 			//on retire au membre un jeton de droit à la connerie
-			member_id[message.author.id].jeton--;
-		}
-		serverQueue = queue.get(message.guild.id);
-		if(!args[0] && commande==='play')
-		{
-			return message.channel.send("Vous n'avez spécifiez pas d'adresse youtube à lire");
-		}else
-		{
-			cmd.run(message,serverQueue);
-		}
-		
-	}
-	else
-	{
-		cmd.run(client,message,args);
-	}
+
+			//on prépare l'objet monkeys
+			let monkey= new monkeys();
+
+			//on recherche un correspondance avec un utilisateur existant
+			let info = await monkey.search_m(message.author.id).then()
+			//si le membre n'existe pas, on le créé immédiatement
+			if( info === null)
+			{
+				result = await monkey.create_m(message.author).then()
+				console.log(`création du membre ${message.author['username']}`)
+			}
 
 
-};
+			//creation du tableau de mise à jour
+			let new_data={};
+			new_data.jeton=monkeys_list[message.author.id].jeton--;
+			new_data.time = Date.now();
+			new_data.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+
+			//mise à jour des donnée du membres
+			info = await monkey.update_m(new_data).then()
+
+			monkeys_list[newMember.id]=monkey;
+
+				//monkeys_list[message.author.id].jeton--;
+			}
+			serverQueue = queue.get(message.guild.id);
+			if(!args[0] && commande==='play')
+			{
+				return message.channel.send("Vous n'avez spécifiez pas d'adresse youtube à lire");
+			}else
+			{
+				cmd.run(message,serverQueue);
+			}
+
+		}
+		else
+		{
+			cmd.run(client,message,args);
+		}
+
+
+	};
